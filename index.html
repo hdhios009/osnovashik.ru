@@ -392,6 +392,14 @@
     input,select,textarea{width:100%;border:1px solid rgba(255,255,255,.18);background:#fff;border-radius:16px;padding:14px 16px;font-size:16px;min-height:52px;font-family:inherit;outline:none;margin-bottom:14px;color:var(--text)}
     textarea{min-height:92px;resize:vertical}
     input:focus,select:focus,textarea:focus{border-color:var(--yellow);box-shadow:0 0 0 3px rgba(255,196,0,.22)}
+    .form-field{margin-bottom:14px;min-width:0}
+    .form-field input,.form-field select,.form-field textarea{margin-bottom:0}
+    .field-error{font-size:13px;color:#FFB4A8;margin:6px 0 0;line-height:1.4}
+    .field-error[hidden]{display:none}
+    .form-status{font-size:14px;line-height:1.45;min-height:18px;margin:8px 0 0;color:#fff}
+    .form-status.err{color:#FFB4A8}
+    .form-status.ok{color:var(--lemon)}
+    form button:disabled{opacity:.7;cursor:default}
     .fineprint{font-size:14px;color:#BFC5CB;margin:12px 0 0;text-align:center}
     .cta-points{display:grid;gap:13px;margin-top:22px}
     .cta-points div{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:16px;color:#fff;font-weight:600;font-size:16px}
@@ -858,48 +866,62 @@
               </div>
             </div>
 
-            <form action="https://formspree.io/f/xwvdewbn" method="POST">
-              <label for="name">Ваше имя</label>
-              <input id="name" type="text" name="Имя" required placeholder="Например: Анна" />
+            <form id="lead-form" novalidate>
+              <div class="form-field" data-field="name">
+                <label for="f_name">Ваше имя</label>
+                <input id="f_name" name="name" type="text" required autocomplete="name" placeholder="Например: Анна">
+                <div class="field-error" data-error-for="name" hidden></div>
+              </div>
 
-              <label for="phone">Телефон</label>
-              <input id="phone" type="tel" name="Телефон" required placeholder="+7 (999) 123-45-67" />
+              <div class="form-field" data-field="phone">
+                <label for="f_phone">Телефон</label>
+                <input id="f_phone" name="phone" type="tel" required autocomplete="tel" inputmode="tel" placeholder="+7 (___) ___-__-__">
+                <div class="field-error" data-error-for="phone" hidden></div>
+              </div>
 
-              <label for="age">Возраст ребёнка</label>
-              <select id="age" name="Возраст ребёнка" required>
-                <option value="" selected disabled>Выберите возраст</option>
-                <option>5 лет</option>
-                <option>6 лет</option>
-                <option>7 лет</option>
-                <option>8 лет</option>
-                <option>9 лет</option>
-                <option>10 лет</option>
-                <option>11 лет</option>
-                <option>12 лет</option>
-                <option>13 лет</option>
-                <option>14 лет</option>
-              </select>
+              <div class="form-field" data-field="age">
+                <label for="f_age">Возраст ребёнка</label>
+                <select id="f_age" name="age" required>
+                  <option value="" selected disabled>Выберите возраст</option>
+                  <option value="5">5 лет</option>
+                  <option value="6">6 лет</option>
+                  <option value="7">7 лет</option>
+                  <option value="8">8 лет</option>
+                  <option value="9">9 лет</option>
+                  <option value="10">10 лет</option>
+                  <option value="11">11 лет</option>
+                  <option value="12">12 лет</option>
+                  <option value="13">13 лет</option>
+                  <option value="14">14 лет</option>
+                </select>
+                <div class="field-error" data-error-for="age" hidden></div>
+              </div>
 
-              <label for="task">Что беспокоит больше всего?</label>
-              <select id="task" name="Что беспокоит" required>
-                <option value="" selected disabled>Выберите задачу</option>
-                <option>Читает, но не понимает смысл</option>
-                <option>Учит — и не может вспомнить</option>
-                <option>Теряет инструкцию</option>
-                <option>Не может пересказать</option>
-                <option>Сложно с подготовкой к школе</option>
-                <option>Ждёт подсказки, не справляется сам</option>
-                <option>Не знаю, хочу диагностику</option>
-              </select>
+              <div class="form-field" data-field="task">
+                <label for="f_task">Что беспокоит больше всего?</label>
+                <select id="f_task" name="task">
+                  <option value="" selected>Выберите задачу</option>
+                  <option>Читает, но не понимает смысл</option>
+                  <option>Учит — и не может вспомнить</option>
+                  <option>Теряет инструкцию</option>
+                  <option>Не может пересказать</option>
+                  <option>Сложно с подготовкой к школе</option>
+                  <option>Ждёт подсказки, не справляется сам</option>
+                  <option>Не знаю, хочу диагностику</option>
+                </select>
+              </div>
 
-              <label for="comment">Комментарий</label>
-              <textarea id="comment" name="Комментарий" placeholder="Коротко опишите ситуацию, если хотите"></textarea>
+              <div class="form-field">
+                <label for="f_comment">Комментарий</label>
+                <textarea id="f_comment" name="comment" placeholder="Коротко опишите ситуацию, если хотите"></textarea>
+              </div>
 
-              <input type="hidden" name="_subject" value="Новая заявка с сайта ОСНОВА с Ириной Шик" />
+              <input id="f_website" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none">
               <p style="margin-top:0;margin-bottom:14px;font-size:14px;color:rgba(255,255,255,.7);line-height:1.5">
                 Нажимая на кнопку «Записаться на диагностику», я даю <a href="privacy.html#consent" style="color:var(--yellow);text-decoration:underline" target="_blank">согласие на обработку персональных данных</a> в соответствии с <a href="privacy.html" style="color:var(--yellow);text-decoration:underline" target="_blank">Политикой конфиденциальности</a>
               </p>
-              <button class="btn yellow" type="submit" style="width:100%">Записаться на диагностику</button>
+              <button id="f_submit" class="btn yellow" type="submit" style="width:100%">Записаться на диагностику</button>
+              <div id="form-status" class="form-status" aria-live="polite"></div>
               <p class="fineprint">Или напишите в мессенджер: <a href="https://t.me/Kotiksym" style="color:#FFD84A;font-weight:900;text-decoration:underline">Telegram</a></p>
             </form>
           </div>
@@ -938,5 +960,6 @@
   "image": "https://osnovashik.ru/images/hero.jpg"
 }
 </script>
+<script src="form.js"></script>
 </body>
 </html>
