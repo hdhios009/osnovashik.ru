@@ -2,7 +2,7 @@
   'use strict';
 
   var FORM_ENDPOINT =
-    'https://script.google.com/macros/s/AKfycby84Y6oEJBSxg2LMXY1rnQ6DNSET0l4fxpiM1I4nXtBasB9sQtoRQQdfBYZyk2zyrDg5w/exec';
+    'https://script.google.com/macros/s/AKfycbzYaWWeW8TkmvLWDi3ki5lP73cM4XVqWXMtwFti5_5Rk7UcVj2jTNvVGq0QlPljUgkl_A/exec';
   var PAGE_NAME = 'ОСНОВА с Ириной Шик — osnovashik.ru';
   var ATTR_KEY = 'osnovashik_attribution';
   var ATTR_FIELDS = [
