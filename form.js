@@ -2,7 +2,7 @@
   'use strict';
 
   var FORM_ENDPOINT =
-    'https://script.google.com/macros/s/AKfycbzYaWWeW8TkmvLWDi3ki5lP73cM4XVqWXMtwFti5_5Rk7UcVj2jTNvVGq0QlPljUgkl_A/exec';
+    'https://script.google.com/macros/s/AKfycbwppaumxbZ9qEaNbZPZgmY96-EaXyJVpGn29BNZurPSMoWqzD3Ey8evs_vj2fnUDyw6Rw/exec';
   var PAGE_NAME = 'ОСНОВА с Ириной Шик — osnovashik.ru';
   var ATTR_KEY = 'osnovashik_attribution';
   var ATTR_FIELDS = [
@@ -227,24 +227,51 @@
     btn.textContent = 'Отправляем…';
     setStatus('', '');
 
-    fetch(FORM_ENDPOINT, {
-      method: 'POST',
-      mode: 'no-cors',
-      body: body
-    })
-      .then(function () {
-        lastSentKey = key;
-        goal('lead_form_submit');
-        setStatus('Заявка отправлена. Мы свяжемся с вами по указанному номеру.', 'ok');
-        if (nameEl) nameEl.value = '';
-        if (phoneEl) phoneEl.value = '';
-        if (ageEl) ageEl.selectedIndex = 0;
-        if (taskEl) taskEl.selectedIndex = 0;
-        if (commentEl) commentEl.value = '';
-        if (websiteEl) websiteEl.value = '';
-        prevPhone = '';
-        clearFieldErrors();
+    function leadOk(data) {
+      if (!data || data.error) return false;
+      if (data.health === true) return false;
+      if (data.message && data.saved !== true && data.duplicate !== true) return false;
+      return data.ok === true || data.success === true;
+    }
+
+    function onLeadOk() {
+      lastSentKey = key;
+      goal('lead_form_submit');
+      setStatus('Заявка отправлена. Мы свяжемся с вами по указанному номеру.', 'ok');
+      if (nameEl) nameEl.value = '';
+      if (phoneEl) phoneEl.value = '';
+      if (ageEl) ageEl.selectedIndex = 0;
+      if (taskEl) taskEl.selectedIndex = 0;
+      if (commentEl) commentEl.value = '';
+      if (websiteEl) websiteEl.value = '';
+      prevPhone = '';
+      clearFieldErrors();
+    }
+
+    var qs = body.toString();
+    fetch(FORM_ENDPOINT + (FORM_ENDPOINT.indexOf('?') >= 0 ? '&' : '?') + qs, { method: 'GET' })
+      .then(function (res) {
+        return res.text().then(function (text) {
+          var data = null;
+          try { data = text ? JSON.parse(text) : null; } catch (err) { data = null; }
+          if (res.ok && leadOk(data)) return data;
+          throw new Error('bad_response');
+        });
       })
+      .catch(function () {
+        return fetch(FORM_ENDPOINT, {
+          method: 'POST',
+          body: body
+        }).then(function (res) {
+          return res.text().then(function (text) {
+            var data = null;
+            try { data = text ? JSON.parse(text) : null; } catch (err) { data = null; }
+            if (res.ok && leadOk(data)) return data;
+            throw new Error('bad_response');
+          });
+        });
+      })
+      .then(onLeadOk)
       .catch(function (err) {
         console.error(err);
         setStatus('Не удалось отправить заявку. Попробуйте ещё раз.', 'err');
