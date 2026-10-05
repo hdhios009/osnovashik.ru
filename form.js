@@ -251,7 +251,14 @@
 
     var qs = body.toString();
     var getUrl = FORM_ENDPOINT + (FORM_ENDPOINT.indexOf('?') >= 0 ? '&' : '?') + qs;
-    var plan = ['GET', 'POST', 'GET', 'POST'];
+    // Google отвечает то за пару секунд, то за полминуты, поэтому первой попытке
+    // даём больше времени, а повторам — меньше, чтобы не затягивать ожидание.
+    var plan = [
+      { method: 'GET', timeout: 20000 },
+      { method: 'POST', timeout: 14000 },
+      { method: 'GET', timeout: 14000 },
+      { method: 'POST', timeout: 14000 }
+    ];
 
     function readLead(res) {
       return res.text().then(function (text) {
@@ -262,17 +269,17 @@
       });
     }
 
-    function once(method) {
+    function once(step) {
       var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
       var timer = null;
       var timeout = new Promise(function (_, reject) {
         timer = setTimeout(function () {
           if (controller) controller.abort();
           reject(new Error('timeout'));
-        }, 10000);
+        }, step.timeout);
       });
       var signal = controller ? controller.signal : undefined;
-      var req = method === 'POST'
+      var req = step.method === 'POST'
         ? fetch(FORM_ENDPOINT, { method: 'POST', body: body, signal: signal })
         : fetch(getUrl, { method: 'GET', signal: signal });
       return Promise.race([req.then(readLead), timeout]).then(function (data) {
