@@ -228,6 +228,7 @@
     body.append('yclid', attribution.yclid || '');
     body.append('gclid', attribution.gclid || '');
     body.append('website', website);
+    body.append('pd_consent', consent && consent.checked ? '1' : '');
 
     busy = true;
     var orig = btn.textContent;
