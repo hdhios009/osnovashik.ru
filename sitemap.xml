@@ -11,4 +11,8 @@
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
+  <url><loc>https://osnovashik.ru/consent.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://osnovashik.ru/cookies.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://osnovashik.ru/offer.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://osnovashik.ru/returns.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>

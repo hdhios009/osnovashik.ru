@@ -471,6 +471,7 @@
       .section-title{font-size:clamp(24px,7vw,30px)}
     }
   </style>
+<script src="/cookie-consent.js" data-ym-id="0" data-cookie-page="/cookies.html" data-privacy-page="/privacy.html" data-accent="#00A8B5"></script>
 </head>
 
 <body>
@@ -869,9 +870,11 @@
               </div>
 
               <input id="f_website" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none">
-              <p style="margin-top:0;margin-bottom:14px;font-size:14px;color:rgba(255,255,255,.7);line-height:1.5">
-                Нажимая на кнопку «Записаться на диагностику», я даю <a href="privacy.html#consent" style="color:var(--yellow);text-decoration:underline" target="_blank">согласие на обработку персональных данных</a> в соответствии с <a href="privacy.html" style="color:var(--yellow);text-decoration:underline" target="_blank">Политикой конфиденциальности</a>
-              </p>
+              <label data-field="consent" style="display:flex;gap:10px;align-items:flex-start;margin:0 0 14px;font-size:14px;color:rgba(255,255,255,.7);line-height:1.5;cursor:pointer">
+                <input id="f_pd_consent" name="pd_consent" type="checkbox" required style="margin-top:3px;flex:0 0 auto;width:18px;height:18px;accent-color:#FFC400">
+                <span>Я даю согласие на <a href="consent.html" style="color:var(--yellow);text-decoration:underline">обработку персональных данных</a> и подтверждаю, что ознакомился(ась) с <a href="privacy.html" style="color:var(--yellow);text-decoration:underline">политикой</a>.</span>
+              </label>
+              <div class="field-error" data-error-for="consent" hidden></div>
               <button id="f_submit" class="btn yellow" type="submit" style="width:100%">Записаться на диагностику</button>
               <div id="form-status" class="form-status" aria-live="polite"></div>
               <p class="fineprint">Или напишите в мессенджер: <a href="https://t.me/Kotiksym" style="color:#FFD84A;font-weight:900;text-decoration:underline">Telegram</a></p>
@@ -886,7 +889,7 @@
       <!-- Футер -->
       <footer style="background:var(--black);color:#fff;padding:20px 24px;font-size:14px;text-align:center">
         <div style="max-width:var(--max);margin:0 auto">
-          <a href="privacy.html" style="color:var(--yellow);text-decoration:none;font-weight:600">Политика конфиденциальности</a>
+          <a href="privacy.html" style="color:var(--yellow);text-decoration:none;font-weight:600">Политика</a><span style="color:rgba(255,255,255,.4);margin:0 8px">&middot;</span><a href="consent.html" style="color:var(--yellow);text-decoration:none;font-weight:600">Согласие</a><span style="color:rgba(255,255,255,.4);margin:0 8px">&middot;</span><a href="cookies.html" data-cookie-settings style="color:var(--yellow);text-decoration:none;font-weight:600">Cookie</a><span style="color:rgba(255,255,255,.4);margin:0 8px">&middot;</span><a href="offer.html" style="color:var(--yellow);text-decoration:none;font-weight:600">Оферта</a><span style="color:rgba(255,255,255,.4);margin:0 8px">&middot;</span><a href="returns.html" style="color:var(--yellow);text-decoration:none;font-weight:600">Возврат</a>
           <span style="color:rgba(255,255,255,.4);margin:0 8px">&middot;</span>
           <span style="color:rgba(255,255,255,.4)">&copy; 2026 ИП Шкодина И.С.</span>
           <div style="margin-top:10px;color:rgba(255,255,255,.4);font-size:14px">Сайт создан в студии <a href="https://studioglubina.ru" target="_blank" rel="noopener" style="color:var(--yellow);text-decoration:none;font-weight:700">ГЛУБИНА</a></div>
