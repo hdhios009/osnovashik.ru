@@ -100,7 +100,6 @@
     showFieldError('name', '');
     showFieldError('phone', '');
     showFieldError('age', '');
-    showFieldError('consent', '');
   }
 
   var attribution = captureAttribution();
@@ -180,13 +179,6 @@
     var extra = [task, comment].filter(Boolean).join(' — ');
     var key = leadKey(name, phone, age);
 
-    var consent = document.getElementById('f_pd_consent');
-    if (consent && !consent.checked) {
-      showFieldError('consent', 'Отметьте согласие на обработку персональных данных');
-      setStatus('Отметьте согласие на обработку персональных данных.', 'err');
-      consent.focus();
-      return;
-    }
     if (!name) {
       showFieldError('name', 'Пожалуйста, укажите имя.');
       setStatus('Пожалуйста, укажите имя.', 'err');
@@ -228,7 +220,6 @@
     body.append('yclid', attribution.yclid || '');
     body.append('gclid', attribution.gclid || '');
     body.append('website', website);
-    body.append('pd_consent', consent && consent.checked ? '1' : '');
 
     busy = true;
     var orig = btn.textContent;
@@ -258,28 +249,54 @@
     }
 
     var qs = body.toString();
-    fetch(FORM_ENDPOINT + (FORM_ENDPOINT.indexOf('?') >= 0 ? '&' : '?') + qs, { method: 'GET' })
-      .then(function (res) {
-        return res.text().then(function (text) {
-          var data = null;
-          try { data = text ? JSON.parse(text) : null; } catch (err) { data = null; }
-          if (res.ok && leadOk(data)) return data;
-          throw new Error('bad_response');
+    var getUrl = FORM_ENDPOINT + (FORM_ENDPOINT.indexOf('?') >= 0 ? '&' : '?') + qs;
+    var plan = ['GET', 'POST', 'GET', 'POST'];
+
+    function readLead(res) {
+      return res.text().then(function (text) {
+        var data = null;
+        try { data = text ? JSON.parse(text) : null; } catch (err) { data = null; }
+        if (res.ok && leadOk(data)) return data;
+        throw new Error('bad_response');
+      });
+    }
+
+    function once(method) {
+      var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      var timer = null;
+      var timeout = new Promise(function (_, reject) {
+        timer = setTimeout(function () {
+          if (controller) controller.abort();
+          reject(new Error('timeout'));
+        }, 10000);
+      });
+      var signal = controller ? controller.signal : undefined;
+      var req = method === 'POST'
+        ? fetch(FORM_ENDPOINT, { method: 'POST', body: body, signal: signal })
+        : fetch(getUrl, { method: 'GET', signal: signal });
+      return Promise.race([req.then(readLead), timeout]).then(function (data) {
+        clearTimeout(timer);
+        return data;
+      }, function (err) {
+        clearTimeout(timer);
+        throw err;
+      });
+    }
+
+    // Приёмник отбрасывает повторы одной заявки в течение двух минут,
+    // поэтому повторная отправка не создаёт дублей.
+    function attempt(i) {
+      return once(plan[i]).catch(function (err) {
+        if (i + 1 >= plan.length) throw err;
+        return new Promise(function (resolve) {
+          setTimeout(resolve, 700 * (i + 1));
+        }).then(function () {
+          return attempt(i + 1);
         });
-      })
-      .catch(function () {
-        return fetch(FORM_ENDPOINT, {
-          method: 'POST',
-          body: body
-        }).then(function (res) {
-          return res.text().then(function (text) {
-            var data = null;
-            try { data = text ? JSON.parse(text) : null; } catch (err) { data = null; }
-            if (res.ok && leadOk(data)) return data;
-            throw new Error('bad_response');
-          });
-        });
-      })
+      });
+    }
+
+    attempt(0)
       .then(onLeadOk)
       .catch(function (err) {
         console.error(err);
