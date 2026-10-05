@@ -5,6 +5,7 @@ User-agent: Yandex
 Allow: /
 
 User-agent: YandexFavicons
+Allow: /favicon.svg
 Allow: /favicon.ico
 Allow: /favicon.png
 Allow: /favicon-120.png

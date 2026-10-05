@@ -238,6 +238,7 @@
       lastSentKey = key;
       goal('lead_form_submit');
       setStatus('Заявка отправлена. Мы свяжемся с вами по указанному номеру.', 'ok');
+      if (window.KotiksymGift) window.KotiksymGift.show();
       if (nameEl) nameEl.value = '';
       if (phoneEl) phoneEl.value = '';
       if (ageEl) ageEl.selectedIndex = 0;
