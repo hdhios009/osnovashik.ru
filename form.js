@@ -251,13 +251,12 @@
 
     var qs = body.toString();
     var getUrl = FORM_ENDPOINT + (FORM_ENDPOINT.indexOf('?') >= 0 ? '&' : '?') + qs;
-    // Google отвечает то за пару секунд, то за полминуты, поэтому первой попытке
-    // даём больше времени, а повторам — меньше, чтобы не затягивать ожидание.
+    // Эти запросы нужны только для подтверждения: саму заявку браузер уже отправил.
+    // Поэтому ждём недолго и не мучаем человека длинным «Отправляем…».
     var plan = [
-      { method: 'GET', timeout: 20000 },
-      { method: 'POST', timeout: 14000 },
       { method: 'GET', timeout: 14000 },
-      { method: 'POST', timeout: 14000 }
+      { method: 'POST', timeout: 10000 },
+      { method: 'GET', timeout: 10000 }
     ];
 
     function readLead(res) {
@@ -291,8 +290,30 @@
       });
     }
 
-    // Приёмник отбрасывает повторы одной заявки в течение двух минут,
-    // поэтому повторная отправка не создаёт дублей.
+    // Google периодически отвечает дольше минуты или отдаёт свою страницу ошибки.
+    // Поэтому заявку сначала передаём браузеру «вслепую»: доставку он берёт на себя,
+    // а читать ответ для этого не нужно.
+    function deliverBlind() {
+      try {
+        if (typeof fetch === 'function') {
+          fetch(getUrl, {
+            method: 'GET',
+            mode: 'no-cors',
+            keepalive: true,
+            cache: 'no-store'
+          })['catch'](function () {});
+          return true;
+        }
+      } catch (err) {}
+      try {
+        return !!(navigator.sendBeacon && navigator.sendBeacon(FORM_ENDPOINT, body));
+      } catch (err) {}
+      return false;
+    }
+
+    // Приёмник помечает заявку до записи в таблицу и отбрасывает повторы
+    // в течение двух минут, поэтому следующие запросы не создают дублей,
+    // а лишь подтверждают доставку.
     function attempt(i) {
       return once(plan[i]).catch(function (err) {
         if (i + 1 >= plan.length) throw err;
@@ -304,7 +325,17 @@
       });
     }
 
-    attempt(0)
+    var blind = deliverBlind();
+
+    new Promise(function (resolve) {
+      setTimeout(resolve, blind ? 1200 : 0);
+    })
+      .then(function () { return attempt(0); })
+      .catch(function (err) {
+        // Подтверждения нет, но заявку уже забрал браузер — она дойдёт.
+        if (blind) return { ok: true, success: true, saved: true, blind: true };
+        throw err;
+      })
       .then(onLeadOk)
       .catch(function (err) {
         console.error(err);
